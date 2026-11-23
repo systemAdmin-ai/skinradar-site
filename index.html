@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkinRadar — скины CS2 дешевле, чем на Steam</title>
+<meta name="description" content="Сравнивает цены CS2-скинов на Steam, Market.CSGO, Waxpeer, DMarket и CSFloat. Показывает реальную выгоду и присылает алерт в Telegram, когда цена падает ниже вашего порога.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+</head>
+<body>
+
+<header class="top">
+  <a class="logo" href="#top"><span class="dot"></span>SkinRadar</a>
+  <nav>
+    <a href="#deals">Сделки</a>
+    <a href="#features">Возможности</a>
+    <a href="#pricing">Тарифы</a>
+  </nav>
+  <div class="top-actions">
+    <button class="ghost" id="loginBtn">Войти</button>
+    <button class="primary" id="signupBtn">Создать аккаунт</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <p class="eyebrow">CS2 · 5 площадок · цены каждые 5 минут</p>
+    <h1>Один скин — пять цен.<br>Покупайте там, где дешевле.</h1>
+    <p class="lead">
+      SkinRadar сравнивает Steam, Market.CSGO, Waxpeer, DMarket и CSFloat.
+      Показывает выгоду, которую можно забрать, и молчит про «выгоду», которой не существует:
+      тролль-лоты за 43 млн ₽ и минимум Steam отсекаются.
+    </p>
+    <div class="cta">
+      <button class="primary big" id="heroSignup">Начать бесплатно</button>
+      <a class="ghost big" href="#deals">Посмотреть сделки</a>
+    </div>
+    <p class="fine">Без карты. Регистрация — 20 секунд. Пароль Steam не нужен никогда.</p>
+  </section>
+
+  <section id="deals" class="block">
+    <div class="block-head">
+      <h2>Дешёвые лоты прямо сейчас</h2>
+      <span class="muted" id="dealsAt">обновляется сканером</span>
+    </div>
+    <div class="table-wrap">
+      <table id="dealsTable">
+        <thead><tr><th>Предмет</th><th>Цена</th><th>Площадка</th><th>Проверено</th></tr></thead>
+        <tbody><tr><td colspan="4" class="muted">Загружаем…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="fine">Порог 3 ₽: ниже идут брелки и патчи, где «выгода» не имеет смысла.</p>
+  </section>
+
+  <section id="features" class="block">
+    <h2>Что внутри</h2>
+    <div class="grid">
+      <article><h3>Пять площадок в одной таблице</h3>
+        <p>Steam — эталон цены. Market.CSGO, Waxpeer, DMarket и CSFloat — где реально купить дешевле.
+        Одна строка на предмет, а не пять вкладок.</p></article>
+      <article><h3>Честная выгода</h3>
+        <p>Steam не принимает лоты дешевле $0,03. Если цена упёрлась в минимум, процент не считается —
+        иначе скин за 0,33 ₽ показывал бы «выгоду 87 %», которой нет.</p></article>
+      <article><h3>Тролль-лоты отсечены</h3>
+        <p>Лот дороже самого дешёвого по предмету в 10 раз помечается аномалией и не участвует
+        в расчёте лучшей цены, выгоды и разброса.</p></article>
+      <article><h3>Фильтры под задачу</h3>
+        <p>Оружие, износ, StatTrak, Souvenir, диапазон цен, минимальная выгода, площадка
+        и способ оплаты — с комиссией в итоговой сумме.</p></article>
+    </div>
+  </section>
+
+  <section id="pricing" class="block">
+    <h2>Тарифы</h2>
+    <div class="plans">
+      <article class="plan">
+        <h3>Free</h3>
+        <p class="price">0 ₽</p>
+        <ul>
+          <li>Поиск и фильтры по всем площадкам</li>
+          <li>Цены Steam без входа</li>
+          <li>Карточка предмета и история</li>
+          <li class="off">Вишлист и алерты</li>
+        </ul>
+        <button class="ghost wide" id="freeBtn">Создать аккаунт</button>
+      </article>
+      <article class="plan pro">
+        <h3>Pro <span class="badge">главное</span></h3>
+        <p class="price">299 ₽<span class="per">/мес</span></p>
+        <ul>
+          <li>Всё из Free</li>
+          <li><b>Вишлист до 50 предметов</b> со своим порогом цены</li>
+          <li><b>Сканер каждые 5 минут</b> по всем площадкам</li>
+          <li><b>Алерт в Telegram</b>, когда цена упала ниже порога</li>
+          <li>Лента срабатываний: что уже было дешевле</li>
+        </ul>
+        <button class="primary wide" id="proBtn">Попробовать Pro</button>
+        <p class="fine">Сейчас демо-режим: подписка включается на 7 дней без списания денег.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block faq">
+    <h2>Вопросы, которые задают</h2>
+    <details><summary>Это безопасно? Пароль Steam нужен?</summary>
+      <p>Нет. Steam-цены публичны, вход не требуется. Мы не просим и не храним пароль Steam,
+      не просим API-ключи площадок и не совершаем покупок за вас.</p></details>
+    <details><summary>Почему у некоторых позиций нет процента выгоды?</summary>
+      <p>Цена Steam упёрлась в минимум площадки (~2,46 ₽). Сравнение с таким «полом» даёт
+      красивую, но фиктивную цифру, поэтому мы её не показываем.</p></details>
+    <details><summary>Когда появятся реальные платежи?</summary>
+      <p>Когда будет ИП или самозанятость и договор с ЮKassa. Сейчас Pro включается в демо-режиме:
+      всё работает, деньги не списываются, это написано на кнопке.</p></details>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>SkinRadar · локальный инструмент и веб-сервис для поиска скинов CS2</span>
+  <span class="muted">Данные площадок принадлежат им; цены — ориентир, а не оферта.</span>
+</footer>
+
+<!-- Модальное окно: вход и регистрация -->
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <button class="close" id="closeModal" aria-label="Закрыть">×</button>
+    <div class="tabs">
+      <button class="tab active" data-tab="signup">Регистрация</button>
+      <button class="tab" data-tab="login">Вход</button>
+    </div>
+    <form id="authForm" novalidate>
+      <label>Email<input type="email" name="email" autocomplete="email" required placeholder="you@example.com"></label>
+      <label>Пароль<input type="password" name="password" autocomplete="new-password" minlength="8" required placeholder="минимум 8 символов"></label>
+      <p class="err" id="authErr"></p>
+      <button class="primary wide" type="submit" id="authSubmit">Создать аккаунт</button>
+      <p class="fine">Пароль хранится только как хеш PBKDF2. Пароль Steam не нужен.</p>
+    </form>
+  </div>
+</div>
+
+<!-- Кабинет -->
+<div class="modal" id="cabinet" hidden>
+  <div class="sheet wide-sheet">
+    <button class="close" id="closeCabinet" aria-label="Закрыть">×</button>
+    <div class="cab-head">
+      <div>
+        <h2 id="cabEmail">—</h2>
+        <p class="muted" id="cabPlan">—</p>
+      </div>
+      <button class="ghost" id="logoutBtn">Выйти</button>
+    </div>
+
+    <div class="pro-box" id="proBox">
+      <div>
+        <h3>Pro: вишлист и алерты</h3>
+        <p class="muted">Сканер проверяет цены каждые 5 минут и пишет в Telegram, когда дешевле порога.</p>
+      </div>
+      <button class="primary" id="activatePro">Включить демо-Pro</button>
+    </div>
+
+    <h3>Вишлист</h3>
+    <form id="wishForm" class="row-form">
+      <input name="item_name" placeholder="AK-47 | Redline (Field-Tested)" required>
+      <input name="max_price" type="number" min="1" step="1" placeholder="порог, ₽" required>
+      <button class="primary" type="submit">Добавить</button>
+    </form>
+    <p class="err" id="wishErr"></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Предмет</th><th>Порог</th><th>Последняя цена</th><th>Срабатываний</th><th></th></tr></thead>
+        <tbody id="wishBody"><tr><td colspan="5" class="muted">Пусто</td></tr></tbody>
+      </table>
+    </div>
+
+    <h3>Лента срабатываний</h3>
+    <ul id="alertList" class="alerts"><li class="muted">Пока пусто</li></ul>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
