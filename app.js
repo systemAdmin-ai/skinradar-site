@@ -2,7 +2,7 @@
    Токен хранится в localStorage. Пароль Steam и ключи площадок сайт не спрашивает. */
 
 const API = location.hostname === "127.0.0.1" || location.hostname === "localhost"
-  ? "http://127.0.0.1:8791"                       // локальный веб-интерфейс приложения
+  ? (location.port === "8791" ? "http://127.0.0.1:8791" : "")   // 8791 — приложение, иначе прокси preview.py
   : "https://skinradar-api.notchdeck.workers.dev";
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -15,9 +15,18 @@ const token = {
 async function api(path, { method = "GET", data, auth = true } = {}) {
   const headers = { "content-type": "application/json" };
   if (auth && token.get()) headers.authorization = `Bearer ${token.get()}`;
-  const res = await fetch(API + path, {
-    method, headers, body: data ? JSON.stringify(data) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(API + path, {
+      method, headers, body: data ? JSON.stringify(data) : undefined,
+      signal: AbortSignal.timeout(12000),
+    });
+  } catch {
+    // Домен API может быть недоступен из сети пользователя (блокировки, VPN, файрвол).
+    const err = new Error("сервис недоступен из вашей сети — включите VPN или попробуйте позже");
+    err.offline = true;
+    throw err;
+  }
   let payload = null;
   try { payload = await res.json(); } catch { /* пустой ответ */ }
   if (!res.ok) {
@@ -46,8 +55,10 @@ async function loadDeals() {
         <td class="muted">${esc(d.updated_at || "")}</td>
       </tr>`).join("");
     $("#dealsAt").textContent = data.updated_at ? `обновлено ${data.updated_at} UTC` : "обновляется сканером";
-  } catch {
-    body.innerHTML = '<tr><td colspan="4" class="muted">Сервис цен временно недоступен.</td></tr>';
+  } catch (ex) {
+    body.innerHTML = `<tr><td colspan="4" class="muted">${
+      ex.offline ? "API недоступен из вашей сети — включите VPN и обновите страницу."
+                 : "Сервис цен временно недоступен."}</td></tr>`;
   }
 }
 
