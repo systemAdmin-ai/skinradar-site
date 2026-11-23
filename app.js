@@ -1,9 +1,16 @@
 /* SkinRadar — фронтенд: сделки, регистрация, кабинет, вишлист.
    Токен хранится в localStorage. Пароль Steam и ключи площадок сайт не спрашивает. */
 
-const API = location.hostname === "127.0.0.1" || location.hostname === "localhost"
-  ? (location.port === "8791" ? "http://127.0.0.1:8791" : "")   // 8791 — приложение, иначе прокси preview.py
-  : "https://skinradar-api.notchdeck.workers.dev";
+/* API живёт на том же домене, что и сайт (российский хостинг: server/app.py отдаёт и статику,
+   и /api). Исключения — витрина на GitHub Pages (там API на Cloudflare) и локальный предпросмотр. */
+const API = (() => {
+  if (window.SKINRADAR_API !== undefined) return window.SKINRADAR_API;   // ручное переопределение
+  if (location.hostname.endsWith("github.io")) return "https://skinradar-api.notchdeck.workers.dev";
+  if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
+    return location.port === "8791" ? "http://127.0.0.1:8791" : "";      // 8791 — приложение, иначе прокси
+  }
+  return "";                                                             // боевой сайт: тот же домен
+})();
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const token = {
@@ -149,11 +156,22 @@ $("#logoutBtn").addEventListener("click", () => {
 });
 
 $("#activatePro").addEventListener("click", async () => {
+  const btn = $("#activatePro");
+  btn.disabled = true;
+  btn.textContent = "Готовим оплату…";
   try {
-    await api("/api/billing/checkout", { method: "POST" });
-    await openCabinet();
+    const data = await api("/api/billing/pay", { method: "POST", data: { months: 1 } });
+    if (data.confirmation_url) {
+      // Боевой режим: уводим на страницу ЮKassa. Вернёмся на /?paid=1.
+      location.href = data.confirmation_url;
+      return;
+    }
+    await openCabinet();                 // демо-режим: Pro уже включён
   } catch (ex) {
     alert(ex.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Оплатить 299 ₽";
   }
 });
 
@@ -214,6 +232,12 @@ async function loadAlerts() {
 /* ── старт ── */
 loadDeals();
 setInterval(loadDeals, 60000);
+
+// Возврат с ЮKassa: ?paid=1 — показываем результат, а не молчаливое «ничего не произошло».
+if (new URLSearchParams(location.search).get("paid") === "1" && token.get()) {
+  setTimeout(() => openCabinet(), 300);
+  history.replaceState(null, "", location.pathname);
+}
 if (token.get()) {
   api("/api/me").then(() => {}).catch((ex) => { if (ex.status === 401) token.clear(); });
 }
